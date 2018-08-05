@@ -12,11 +12,12 @@ end
 function Controller:update(dt)
    for _, e in ipairs(self.pool.objects) do
       local transform = e:get(C.transform)
+      local controllable = e:get(C.controllable)
 
       local movementVector = Cpml.vec3()
 
-      if love.keyboard.isDown("w") then movementVector = movementVector + transform.forward end
-      if love.keyboard.isDown("s") then movementVector = movementVector - transform.forward end
+      if love.keyboard.isDown("w") then movementVector = movementVector - transform.forward end
+      if love.keyboard.isDown("s") then movementVector = movementVector + transform.forward end
 
       if love.keyboard.isDown("a") then movementVector = movementVector + transform.right end
       if love.keyboard.isDown("d") then movementVector = movementVector - transform.right end
@@ -24,7 +25,13 @@ function Controller:update(dt)
       if love.keyboard.isDown("space")  then movementVector.y = movementVector.y + 1 end
       if love.keyboard.isDown("lshift") then movementVector.y = movementVector.y - 1 end
 
-      transform.position = transform.position + movementVector * 10 * dt
+      controllable.velocity = controllable.velocity + movementVector * 250 * dt
+      transform.position = transform.position + controllable.velocity * dt
+      controllable.velocity = controllable.velocity - (controllable.velocity * controllable.friction * dt)
+
+      transform.rotation = transform.rotation + controllable.turnVelocity * dt
+      controllable.turnVelocity = controllable.turnVelocity - (controllable.turnVelocity * controllable.turnFriction * dt)
+      transform.rotation.y = math.min(math.pi/2, math.max(-math.pi/2, transform.rotation.y))
    end
 
    love.window.setTitle(love.timer.getFPS())
@@ -45,9 +52,11 @@ function Controller:mousemoved(x, y, dx, dy)
    if self.isRelative then
       for _, e in ipairs(self.pool.objects) do
          local transform = e:get(C.transform)
+         local controllable = e:get(C.controllable)
 
-         local rotationVector = Cpml.vec2(-dx, dy)
-         transform.rotation = transform.rotation + rotationVector / 80
+         local rotationVector = Cpml.vec3(-dx, dy, 0)
+
+         controllable.turnVelocity = controllable.turnVelocity + rotationVector / 10
       end
    end
 end

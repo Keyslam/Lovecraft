@@ -11,8 +11,10 @@ vec4 position(mat4 transform_projection, vec4 vertex_position) {
 #endif
 
 #ifdef PIXEL
+uniform vec4 dColor; 
+
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords) {
 	vec4 pixel = Texel(tex, texture_coords);
-	return color * pixel;
+	return color * pixel * dColor;
 }
 #endif

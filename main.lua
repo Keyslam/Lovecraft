@@ -1,3 +1,5 @@
+love.graphics.setDefaultFilter("nearest", "nearest")
+
 local Cpml = require("lib.cpml")
 local Concord = require("lib.concord").init({
    useEvents = true,
@@ -17,25 +19,27 @@ Game:addSystem(controller, "update")
 Game:addSystem(controller, "keypressed")
 Game:addSystem(controller, "mousemoved")
 
-Game:addSystem(cameraController, "draw", "attach")
-Game:addSystem(S.meshRenderer(), "draw")
-Game:addSystem(cameraController, "draw", "detach")
 Game:addSystem(cameraController, "draw")
+Game:addSystem(S.meshRenderer(), "renderscene", "draw")
 
-local CameraEntity = Concord.entity()
-CameraEntity:give(C.transform)
-CameraEntity:give(C.camera)
-CameraEntity:give(C.controllable)
+local Camera = Concord.entity()
+Camera:give(C.transform)
+Camera:give(C.camera)
+Camera:give(C.controllable)
 
-Game:addEntity(CameraEntity)
+Game:addEntity(Camera)
 
-for x = 1, 4 do
-   for z = 1, 4 do
-      local cube = Concord.entity()
-      cube:give(C.transform, Cpml.vec3(x * 2, (x + z) * 2, z * 2))
-      cube:give(C.mesh, CubeMesh)
+for x = 1, 20 do
+   for z = 1, 20 do
+      --for z = 1, 16 do
+         if love.math.random() < 0.7 then
+            local cube = Concord.entity()
+            cube:give(C.transform, Cpml.vec3(x - 10, x + z, 10 + z))
+            cube:give(C.mesh, CubeMesh)
 
-      Game:addEntity(cube)
+            Game:addEntity(cube)
+         end
+      --end
    end
 end
 

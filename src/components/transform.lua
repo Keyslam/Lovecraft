@@ -1,28 +1,17 @@
 local Concord = require("lib.concord")
 local Cpml    = require("lib.cpml")
 
-local Transform = Concord.component(function(e, position, rotation, scale)
+local Transform = Concord.component(function(e, position, rotation)
    e.position = position or Cpml.vec3(0, 0, 0)
-   e.rotation = rotation or Cpml.vec2(0, 0) -- TODO make this a quaternion please
-   e.scale    = scale    or Cpml.vec3(0, 0, 0)
-
-   e.hasChanged = true
+   e.rotation = rotation or Cpml.vec3(0, 0, 0)
 end)
 
 local GetProperties, SetProperties = {}, {}
-function GetProperties:direction()
+function GetProperties:forward()
    return Cpml.vec3(
       math.cos(self.rotation.y) * math.sin(self.rotation.x),
       math.sin(self.rotation.y),
       math.cos(self.rotation.y) * math.cos(self.rotation.x)
-   )
-end
-
-function GetProperties:forward() 
-   return Cpml.vec3(
-      math.sin(self.rotation.x + math.pi),
-      math.sin(self.rotation.y),
-      math.cos(self.rotation.x + math.pi)
    )
 end
 
@@ -35,7 +24,7 @@ function GetProperties:right()
 end
 
 function GetProperties:up()
-   return Cpml.vec3.cross(self.right, self.direction)
+   return Cpml.vec3.cross(self.right, self.forward)
 end
 
 
